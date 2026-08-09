@@ -33,8 +33,12 @@ export const uploadToCloudinary = async (filePath, folder, options = {}) => {
       originalFilename: result.original_filename,
     };
   } catch (error) {
-    logger.error(`Cloudinary upload failed: ${error.message}`);
-    throw ApiError.internal(MESSAGES.MEDIA.UPLOAD_FAILED);
+    logger.error(`Cloudinary upload failed: ${error.message}`, {
+      stack: error.stack,
+      httpCode: error.http_code,
+      name: error.name,
+    });
+    throw ApiError.internal(`${MESSAGES.MEDIA.UPLOAD_FAILED}: ${error.message}`);
   }
 };
 

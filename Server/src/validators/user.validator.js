@@ -36,7 +36,12 @@ export const createUserSchema = z.object({
   name,
   email,
   password,
-  role: objectId.describe('Role ID'),
+  role: z
+    .string({ required_error: 'Role is required' })
+    .trim()
+    .toLowerCase()
+    .min(1, 'Role is required')
+    .describe('Role name (e.g., admin, manager, editor)'),
   isActive: z.boolean().optional().default(true),
 });
 
@@ -44,7 +49,7 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z.object({
   name: name.optional(),
   email: email.optional(),
-  role: objectId.optional(),
+  role: z.string().trim().toLowerCase().optional(),
   isActive: z.boolean().optional(),
 }).refine((data) => Object.keys(data).length > 0, {
   message: 'At least one field must be provided for update',

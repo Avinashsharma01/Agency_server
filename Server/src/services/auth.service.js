@@ -302,6 +302,83 @@ class AuthService {
   }
 
   /**
+   * Registers a new admin user.
+   * Auto-creates the 'admin' role if it does not exist.
+   * Returns access token, refresh token, and user data (same shape as login).
+   *
+   * @param {object} data - { name, email, password }
+   * @param {object} meta - { userAgent, ip } for refresh token tracking
+   * @returns {Promise<{ user: object, accessToken: string, refreshToken: string }>}
+   */
+  async registerAdmin({ name, email, password }, meta = {}) {
+    // 1. Check if email is already taken
+    const existingUser = await userRepository.findByEmailLean(email);
+    if (existingUser) {
+      throw ApiError.conflict(MESSAGES.USER.EMAIL_EXISTS);
+    }
+
+    // 2. Get (or auto-create) the admin role
+    let adminRole = await roleRepository.findByName(ROLES.ADMIN);
+    if (!adminRole) {
+      adminRole = await roleRepository.model.create({
+        name: ROLES.ADMIN,
+        description: 'Full system access. Can manage all resources, users, and settings.',
+        isActive: true,
+      });
+      logger.info('Admin role auto-created during registration');
+    }
+
+    // 3. Create user (password hashing is handled by the pre-save hook)
+    const user = await userRepository.model.create({
+      name,
+      email,
+      password,
+      role: adminRole._id,
+      isActive: true,
+    });
+
+    // 4. Generate tokens
+    const tokenPayload = {
+      id: user._id.toString(),
+      email: user.email,
+      role: ROLES.ADMIN,
+    };
+
+    const accessToken = generateAccessToken(tokenPayload);
+    const refreshToken = generateRefreshToken({ id: user._id.toString() });
+
+    // 5. Store refresh token
+    const refreshExpiry = new Date(
+      Date.now() + parseExpiryToMs(config.jwt.refreshExpiry)
+    );
+
+    user.addRefreshToken(
+      refreshToken,
+      refreshExpiry,
+      meta.userAgent || '',
+      meta.ip || ''
+    );
+    await user.save({ validateBeforeSave: false });
+
+    // 6. Update login tracking
+    await userRepository.updateLoginInfo(user._id);
+
+    // 7. Build sanitized user response
+    const userData = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: { _id: adminRole._id, name: adminRole.name },
+      avatar: user.avatar,
+      isActive: user.isActive,
+    };
+
+    logger.info(`Admin registered: ${user.email}`);
+
+    return { user: userData, accessToken, refreshToken };
+  }
+
+  /**
    * Gets cookie options for the refresh token.
    *
    * @returns {object} Cookie configuration object
