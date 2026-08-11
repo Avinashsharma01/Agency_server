@@ -114,11 +114,26 @@ class BaseRepository {
       query = query.sort(options.sort);
     }
 
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+
     if (options.lean !== false) {
       query = query.lean();
     }
 
     return query.exec();
+  }
+
+  /**
+   * Alias for findAll.
+   *
+   * @param {object} [filter={}] - MongoDB filter
+   * @param {object} [options={}] - Options { populate, select, sort, limit, lean }
+   * @returns {Promise<Document[]>} Array of documents
+   */
+  async findMany(filter = {}, options = {}) {
+    return this.findAll(filter, options);
   }
 
   /**
