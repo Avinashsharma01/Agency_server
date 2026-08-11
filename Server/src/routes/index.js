@@ -5,6 +5,8 @@ import categoryRoutes from './category.routes.js';
 import serviceRoutes from './service.routes.js';
 import packageRoutes from './package.routes.js';
 import faqRoutes from './faq.routes.js';
+import portfolioRoutes from './portfolio.routes.js';
+import blogRoutes from './blog.routes.js';
 
 const router = Router();
 
@@ -19,6 +21,8 @@ router.use('/categories', categoryRoutes);
 router.use('/services', serviceRoutes);
 router.use('/packages', packageRoutes);
 router.use('/faqs', faqRoutes);
+router.use('/portfolio', portfolioRoutes);
+router.use('/blogs', blogRoutes);
 
 // Phase 3+: Additional routes will be mounted here
 // router.use('/categories', categoryRoutes);
