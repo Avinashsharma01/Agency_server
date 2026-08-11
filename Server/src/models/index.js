@@ -4,8 +4,8 @@ export { default as Role } from './Role.model.js';
 // Phase 3+: Additional models will be exported here
 export { default as Category } from './Category.model.js';
 export { default as Service } from './Service.model.js';
-// export { default as Package } from './Package.model.js';
-// export { default as Faq } from './Faq.model.js';
+export { default as Package } from './Package.model.js';
+export { default as Faq } from './Faq.model.js';
 // export { default as Portfolio } from './Portfolio.model.js';
 // export { default as PortfolioImage } from './PortfolioImage.model.js';
 // export { default as Blog } from './Blog.model.js';
