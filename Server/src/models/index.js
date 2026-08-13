@@ -11,5 +11,5 @@ export { default as Blog } from './Blog.model.js';
 export { default as Testimonial } from './Testimonial.model.js';
 export { default as TeamMember } from './TeamMember.model.js';
 export { default as Lead } from './Lead.model.js';
-// export { default as Media } from './Media.model.js';
-// export { default as Setting } from './Setting.model.js';
+export { default as Media } from './Media.model.js';
+export { default as Setting } from './Setting.model.js';

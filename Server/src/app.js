@@ -6,11 +6,17 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import mongoSanitize from 'express-mongo-sanitize';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import config from './config/index.js';
 import logger from './utils/logger.js';
 import { apiLimiter } from './middlewares/rateLimiter.middleware.js';
 import errorHandler from './middlewares/errorHandler.middleware.js';
 import notFoundHandler from './middlewares/notFound.middleware.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -36,6 +42,7 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(config.cookie.secret));
+app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
 
 // ─── Compression ────────────────────────────────────────────────────────────
 app.use(compression());
