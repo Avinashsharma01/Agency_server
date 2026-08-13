@@ -57,3 +57,18 @@ export const changePasswordSchema = z.object({
   message: 'New password must be different from the current password',
   path: ['newPassword'],
 });
+
+// ─── Register Admin ─────────────────────────────────────────────────────────
+export const registerAdminSchema = z.object({
+  name: z
+    .string({ required_error: 'Name is required' })
+    .trim()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must not exceed 100 characters'),
+  email,
+  password,
+  confirmPassword: z.string({ required_error: 'Confirm password is required' }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});

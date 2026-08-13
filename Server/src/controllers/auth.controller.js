@@ -37,6 +37,34 @@ class AuthController {
   });
 
   /**
+   * POST /api/v1/auth/register
+   * Registers a new admin user and returns tokens.
+   */
+  registerAdmin = asyncHandler(async (req, res) => {
+    const { name, email, password } = req.body;
+
+    const meta = {
+      userAgent: req.headers['user-agent'] || '',
+      ip: req.ip || req.connection.remoteAddress || '',
+    };
+
+    const { user, accessToken, refreshToken } = await authService.registerAdmin(
+      { name, email, password },
+      meta
+    );
+
+    // Set refresh token as HTTP-only cookie
+    res.cookie('refreshToken', refreshToken, authService.getRefreshTokenCookieOptions());
+
+    res.status(HTTP_STATUS.CREATED).json(
+      ApiResponse.created(
+        { user, accessToken },
+        MESSAGES.AUTH.REGISTER_SUCCESS
+      )
+    );
+  });
+
+  /**
    * POST /api/v1/auth/logout
    * Logs out the current session by invalidating the refresh token.
    */

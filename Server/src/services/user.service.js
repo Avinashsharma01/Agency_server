@@ -27,11 +27,14 @@ class UserService {
       throw new ApiError(HTTP_STATUS.CONFLICT, MESSAGES.USER.EMAIL_EXISTS);
     }
 
-    // Validate role exists
-    const role = await roleRepository.findById(userData.role);
+    // Resolve role name to role document
+    const role = await roleRepository.findByName(userData.role);
     if (!role) {
-      throw ApiError.badRequest('Invalid role ID. Role does not exist.');
+      throw ApiError.badRequest(`Invalid role '${userData.role}'. Valid roles: admin, manager, editor.`);
     }
+
+    // Replace role name with role ObjectId
+    userData.role = role._id;
 
     // Create user
     const user = await userRepository.create(userData);
@@ -98,12 +101,13 @@ class UserService {
       }
     }
 
-    // Validate role if being changed
+    // Resolve role name if being changed
     if (updateData.role) {
-      const role = await roleRepository.findById(updateData.role);
+      const role = await roleRepository.findByName(updateData.role);
       if (!role) {
-        throw ApiError.badRequest('Invalid role ID. Role does not exist.');
+        throw ApiError.badRequest(`Invalid role '${updateData.role}'. Valid roles: admin, manager, editor.`);
       }
+      updateData.role = role._id;
     }
 
     const updatedUser = await userRepository.updateById(userId, updateData, {

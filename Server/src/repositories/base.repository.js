@@ -114,11 +114,26 @@ class BaseRepository {
       query = query.sort(options.sort);
     }
 
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+
     if (options.lean !== false) {
       query = query.lean();
     }
 
     return query.exec();
+  }
+
+  /**
+   * Alias for findAll.
+   *
+   * @param {object} [filter={}] - MongoDB filter
+   * @param {object} [options={}] - Options { populate, select, sort, limit, lean }
+   * @returns {Promise<Document[]>} Array of documents
+   */
+  async findMany(filter = {}, options = {}) {
+    return this.findAll(filter, options);
   }
 
   /**
@@ -130,8 +145,9 @@ class BaseRepository {
    * @returns {Promise<{ data: Document[], pagination: object }>}
    */
   async findPaginated(reqQuery, baseFilter = {}, options = {}) {
+    const defaultFilter = { isDeleted: { $ne: true }, ...baseFilter };
     const qb = new QueryBuilder(reqQuery, this.searchableFields);
-    const filter = qb.buildFilter(baseFilter);
+    const filter = qb.buildFilter(defaultFilter);
     const sort = qb.buildSort();
     const select = qb.buildSelect();
 
@@ -252,6 +268,16 @@ class BaseRepository {
   }
 
   /**
+   * Alias for softDeleteById.
+   *
+   * @param {string} id - Document ObjectId
+   * @returns {Promise<Document|null>}
+   */
+  async softDelete(id) {
+    return this.softDeleteById(id);
+  }
+
+  /**
    * Restores a soft-deleted document.
    *
    * @param {string} id - Document ObjectId
@@ -262,6 +288,16 @@ class BaseRepository {
       isDeleted: false,
       deletedAt: null,
     });
+  }
+
+  /**
+   * Alias for restoreById.
+   *
+   * @param {string} id - Document ObjectId
+   * @returns {Promise<Document|null>}
+   */
+  async restore(id) {
+    return this.restoreById(id);
   }
 
   /**

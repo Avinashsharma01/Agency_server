@@ -5,6 +5,7 @@ import validate from '../middlewares/validate.middleware.js';
 import { authLimiter, passwordResetLimiter } from '../middlewares/rateLimiter.middleware.js';
 import {
   loginSchema,
+  registerAdminSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   resetPasswordParamsSchema,
@@ -54,6 +55,55 @@ router.post(
   authLimiter,
   validate({ body: loginSchema }),
   authController.login
+);
+
+/**
+ * @swagger
+ * /api/v1/auth/register:
+ *   post:
+ *     summary: Register a new admin user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 100
+ *                 example: Super Admin
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: admin@agency.com
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *                 description: Must contain uppercase, lowercase, number, and special character
+ *               confirmPassword:
+ *                 type: string
+ *                 description: Must match password
+ *     responses:
+ *       201:
+ *         description: Admin registered successfully. Returns user data and access token. Sets refresh token cookie.
+ *       409:
+ *         description: Email already exists
+ *       422:
+ *         description: Validation error
+ */
+router.post(
+  '/register',
+  authLimiter,
+  validate({ body: registerAdminSchema }),
+  authController.registerAdmin
 );
 
 /**
