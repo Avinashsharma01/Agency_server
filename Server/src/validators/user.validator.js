@@ -6,6 +6,8 @@ import mongoose from 'mongoose';
  */
 const objectId = z
   .string()
+  .trim()
+  .transform((val) => val.replace(/^["']|["']$/g, '').trim())
   .refine((val) => mongoose.Types.ObjectId.isValid(val), {
     message: 'Invalid ObjectId format',
   });

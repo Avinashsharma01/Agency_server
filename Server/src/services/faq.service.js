@@ -142,7 +142,7 @@ class FaqService {
       throw ApiError.notFound('FAQ not found');
     }
 
-    return faqRepository.softDelete(faqId);
+    return faqRepository.softDeleteById(faqId);
   }
 }
 

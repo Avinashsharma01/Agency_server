@@ -145,8 +145,9 @@ class BaseRepository {
    * @returns {Promise<{ data: Document[], pagination: object }>}
    */
   async findPaginated(reqQuery, baseFilter = {}, options = {}) {
+    const defaultFilter = { isDeleted: { $ne: true }, ...baseFilter };
     const qb = new QueryBuilder(reqQuery, this.searchableFields);
-    const filter = qb.buildFilter(baseFilter);
+    const filter = qb.buildFilter(defaultFilter);
     const sort = qb.buildSort();
     const select = qb.buildSelect();
 
@@ -267,6 +268,16 @@ class BaseRepository {
   }
 
   /**
+   * Alias for softDeleteById.
+   *
+   * @param {string} id - Document ObjectId
+   * @returns {Promise<Document|null>}
+   */
+  async softDelete(id) {
+    return this.softDeleteById(id);
+  }
+
+  /**
    * Restores a soft-deleted document.
    *
    * @param {string} id - Document ObjectId
@@ -277,6 +288,16 @@ class BaseRepository {
       isDeleted: false,
       deletedAt: null,
     });
+  }
+
+  /**
+   * Alias for restoreById.
+   *
+   * @param {string} id - Document ObjectId
+   * @returns {Promise<Document|null>}
+   */
+  async restore(id) {
+    return this.restoreById(id);
   }
 
   /**

@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
-const objectId = z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
-  message: 'Invalid ObjectId format',
-});
+const objectId = z
+  .string()
+  .trim()
+  .transform((val) => val.replace(/^["']|["']$/g, '').trim())
+  .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+    message: 'Invalid ObjectId format',
+  });
 
 const name = z
   .string({ required_error: 'Package name is required' })
