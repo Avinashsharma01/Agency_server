@@ -73,6 +73,32 @@ app.get('/health', (req, res) => {
   });
 });
 
+// ─── Swagger Documentation ──────────────────────────────────────────────────
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
+
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Agency CMS — API Documentation',
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'none',
+      filter: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'method',
+    },
+  })
+);
+
+// Serve raw JSON spec at /api-docs.json
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // ─── API Routes ─────────────────────────────────────────────────────────────
 import routes from './routes/index.js';
 app.use(`/api/${config.app.apiVersion}`, routes);
