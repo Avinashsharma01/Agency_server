@@ -81,7 +81,7 @@ router.get(
 // ─── Protected Routes (Admin / Manager / Editor) ────────────────────────────
 
 router.use(authenticate);
-router.use(authorize(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.MANAGER, ROLES.EDITOR));
+router.use(authorize(ROLES.ADMIN, ROLES.MANAGER, ROLES.EDITOR));
 
 /**
  * @swagger

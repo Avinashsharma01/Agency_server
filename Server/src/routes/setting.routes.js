@@ -3,6 +3,7 @@ import settingController from '../controllers/setting.controller.js';
 import authenticate from '../middlewares/auth.middleware.js';
 import authorize from '../middlewares/rbac.middleware.js';
 import validate from '../middlewares/validate.middleware.js';
+import { uploadSingleImage } from '../middlewares/upload.middleware.js';
 import { updateSettingsSchema } from '../validators/setting.validator.js';
 import { ROLES } from '../constants/index.js';
 
@@ -29,7 +30,7 @@ const router = Router();
  */
 router.get('/', settingController.getSettings);
 
-// ─── Protected Route (Admin only) ──────────────────────────────────────────
+// ─── Protected Routes (Admin only) ─────────────────────────────────────────
 
 /**
  * @swagger
@@ -39,6 +40,12 @@ router.get('/', settingController.getSettings);
  *     tags: [Settings]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Settings'
  *     responses:
  *       200:
  *         description: Settings updated
@@ -46,9 +53,99 @@ router.get('/', settingController.getSettings);
 router.put(
   '/',
   authenticate,
-  authorize(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  authorize(ROLES.ADMIN),
   validate({ body: updateSettingsSchema }),
   settingController.updateSettings
+);
+
+/**
+ * @swagger
+ * /api/v1/settings/logo:
+ *   put:
+ *     summary: Upload/replace site logo
+ *     tags: [Settings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Logo updated
+ */
+router.put(
+  '/logo',
+  authenticate,
+  authorize(ROLES.ADMIN),
+  uploadSingleImage,
+  settingController.updateLogo
+);
+
+/**
+ * @swagger
+ * /api/v1/settings/favicon:
+ *   put:
+ *     summary: Upload/replace favicon
+ *     tags: [Settings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Favicon updated
+ */
+router.put(
+  '/favicon',
+  authenticate,
+  authorize(ROLES.ADMIN),
+  uploadSingleImage,
+  settingController.updateFavicon
+);
+
+/**
+ * @swagger
+ * /api/v1/settings/og-image:
+ *   put:
+ *     summary: Upload/replace SEO Open Graph image
+ *     tags: [Settings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: OG image updated
+ */
+router.put(
+  '/og-image',
+  authenticate,
+  authorize(ROLES.ADMIN),
+  uploadSingleImage,
+  settingController.updateOgImage
 );
 
 export default router;

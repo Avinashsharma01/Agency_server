@@ -2,6 +2,9 @@ import { cloudinary } from '../config/cloudinary.js';
 import ApiError from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 import { MESSAGES } from '../constants/index.js';
+import config from '../config/index.js';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Uploads a file to Cloudinary.
@@ -117,4 +120,102 @@ export const getTransformedUrl = (publicId, transformations = {}) => {
     fetch_format: 'auto',
     ...transformations,
   });
+};
+
+/**
+ * Uploads a file to Cloudinary with local-storage fallback.
+ * If Cloudinary is unreachable (e.g., invalid credentials in dev),
+ * the file is served from the local /uploads directory.
+ *
+ * @param {string} filePath - Local file path to upload
+ * @param {object} [options={}] - { folder, filename, ...cloudinaryOptions }
+ * @returns {Promise<object>} Upload result with isLocal flag
+ */
+export const uploadWithFallback = async (filePath, options = {}) => {
+  const {
+    folder = 'agency-cms',
+    resource_type = 'auto',
+    filename,
+    ...rest
+  } = options;
+
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder,
+      resource_type,
+      ...rest,
+    });
+
+    return {
+      publicId: result.public_id,
+      url: result.secure_url,
+      width: result.width || 0,
+      height: result.height || 0,
+      format: result.format || '',
+      bytes: result.bytes || 0,
+      resourceType: result.resource_type || 'image',
+      isLocal: false,
+    };
+  } catch (error) {
+    logger.warn(`⚠️ Cloudinary upload error: ${error.message}. Falling back to local storage.`);
+
+    const basename = filename || path.basename(filePath);
+    const host = `http://localhost:${config.app.port}`;
+    const localUrl = `${host}/uploads/${basename}`;
+
+    return {
+      publicId: `local/${basename}`,
+      url: localUrl,
+      width: 0,
+      height: 0,
+      format: path.extname(basename).replace('.', ''),
+      bytes: fs.existsSync(filePath) ? fs.statSync(filePath).size : 0,
+      resourceType: 'image',
+      isLocal: true,
+    };
+  }
+};
+
+/**
+ * Deletes a resource from Cloudinary. If the publicId indicates a local file,
+ * removes it from the local uploads directory instead.
+ *
+ * @param {string} publicId - Cloudinary public_id or 'local/filename'
+ * @param {string} [resourceType='image'] - Resource type
+ * @returns {Promise<object>} Deletion result
+ */
+export const deleteWithFallback = async (publicId, resourceType = 'image') => {
+  if (publicId.startsWith('local/')) {
+    const filename = publicId.replace('local/', '');
+    const localPath = path.resolve(process.cwd(), 'src', 'uploads', filename);
+    deleteLocalFile(localPath);
+    return { result: 'deleted (local)' };
+  }
+
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
+    });
+    logger.info(`☁️ Cloudinary resource deleted: ${publicId} (${result.result})`);
+    return result;
+  } catch (error) {
+    logger.warn(`⚠️ Cloudinary deletion failed for ${publicId}: ${error.message}`);
+    return { result: 'failed' };
+  }
+};
+
+/**
+ * Removes a local file from disk.
+ *
+ * @param {string} filePath - Absolute path to the file
+ */
+export const deleteLocalFile = (filePath) => {
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      logger.debug(`🗑️ Temp file removed: ${filePath}`);
+    }
+  } catch (error) {
+    logger.warn(`⚠️ Failed to remove temp file ${filePath}: ${error.message}`);
+  }
 };

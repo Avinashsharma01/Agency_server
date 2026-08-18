@@ -70,7 +70,7 @@ router.get(
 // ─── Protected Routes (Admin / Manager) ─────────────────────────────────────
 
 router.use(authenticate);
-router.use(authorize(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.MANAGER));
+router.use(authorize(ROLES.ADMIN, ROLES.MANAGER));
 
 /**
  * @swagger

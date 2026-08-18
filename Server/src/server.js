@@ -2,6 +2,7 @@ import app from './app.js';
 import config from './config/index.js';
 import connectDatabase, { disconnectDatabase } from './config/database.js';
 import configureCloudinary from './config/cloudinary.js';
+import { connectRedis, disconnectRedis } from './config/redis.js';
 import logger from './utils/logger.js';
 
 /**
@@ -19,6 +20,9 @@ const startServer = async () => {
     // Configure Cloudinary
     configureCloudinary();
 
+    // Connect to Redis (optional — fails gracefully)
+    await connectRedis();
+
     // Start HTTP server
     const server = app.listen(config.app.port, () => {
       logger.info(`🚀 Server running in ${config.app.env} mode on port ${config.app.port}`);
@@ -32,6 +36,9 @@ const startServer = async () => {
       // Stop accepting new connections
       server.close(async () => {
         logger.info('✅ HTTP server closed');
+
+        // Close Redis connection
+        await disconnectRedis();
 
         // Close database connection
         await disconnectDatabase();
