@@ -1,9 +1,9 @@
 import mediaRepository from '../repositories/media.repository.js';
 import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
+  uploadWithFallback,
+  deleteWithFallback,
   deleteLocalFile,
-} from '../utils/cloudinaryUploader.js';
+} from '../helpers/cloudinary.helper.js';
 import ApiError from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 
@@ -31,7 +31,7 @@ class MediaService {
 
     try {
       // Upload to Cloudinary (with local storage fallback)
-      cloudinaryResult = await uploadToCloudinary(file.path, {
+      cloudinaryResult = await uploadWithFallback(file.path, {
         folder: `agency-cms/${folder}`,
         filename: file.filename,
       });
@@ -163,7 +163,7 @@ class MediaService {
     // Delete from Cloudinary
     try {
       const resourceType = media.mimeType?.startsWith('video') ? 'video' : 'image';
-      await deleteFromCloudinary(media.publicId, resourceType);
+      await deleteWithFallback(media.publicId, resourceType);
     } catch (error) {
       logger.warn(`⚠️  Cloudinary deletion failed for ${media.publicId}, proceeding with DB soft delete: ${error.message}`);
     }

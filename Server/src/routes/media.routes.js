@@ -18,7 +18,7 @@ const router = Router();
 
 // ─── All Media Routes Are Protected ─────────────────────────────────────────
 router.use(authenticate);
-router.use(authorize(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.MANAGER, ROLES.EDITOR));
+router.use(authorize(ROLES.ADMIN, ROLES.MANAGER, ROLES.EDITOR));
 
 /**
  * @swagger
