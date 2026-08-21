@@ -7,9 +7,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "seed": "node src/database/seeds/roleSeeder.js && node src/database/seeds/adminSeeder.js",
+    "seed": "node src/database/seeds/masterSeeder.js",
     "seed:roles": "node src/database/seeds/roleSeeder.js",
     "seed:admin": "node src/database/seeds/adminSeeder.js",
+    "seed:master": "node src/database/seeds/masterSeeder.js",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
   },

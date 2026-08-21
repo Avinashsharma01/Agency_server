@@ -32,7 +32,7 @@ const packageSchema = new mongoose.Schema(
       type: String,
       trim: true,
       uppercase: true,
-      default: 'USD',
+      default: 'INR',
     },
     billingPeriod: {
       type: String,
