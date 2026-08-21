@@ -3,6 +3,7 @@ import serviceController from '../controllers/service.controller.js';
 import authenticate from '../middlewares/auth.middleware.js';
 import authorize from '../middlewares/rbac.middleware.js';
 import validate from '../middlewares/validate.middleware.js';
+import { uploadSingleImage } from '../middlewares/upload.middleware.js';
 import {
   createServiceSchema,
   updateServiceSchema,
@@ -156,6 +157,25 @@ router.put(
 
 /**
  * @swagger
+ * /api/v1/services/{id}/featured-image:
+ *   put:
+ *     summary: Upload service banner image
+ *     tags: [Services]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Service banner image uploaded
+ */
+router.put(
+  '/:id/featured-image',
+  validate({ params: idParamSchema }),
+  uploadSingleImage,
+  serviceController.uploadFeaturedImage
+);
+
+/**
+ * @swagger
  * /api/v1/services/{id}:
  *   delete:
  *     summary: Delete service by ID
@@ -173,3 +193,4 @@ router.delete(
 );
 
 export default router;
+

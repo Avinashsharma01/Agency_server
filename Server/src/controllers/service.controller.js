@@ -97,6 +97,18 @@ class ServiceController {
   });
 
   /**
+   * PUT /api/v1/services/:id/featured-image
+   * Uploads or updates the service banner image (Protected: Admin/Manager).
+   */
+  uploadFeaturedImage = asyncHandler(async (req, res) => {
+    const service = await serviceService.uploadFeaturedImage(req.params.id, req.file);
+
+    res.status(HTTP_STATUS.OK).json(
+      ApiResponse.ok(service, 'Service banner image uploaded successfully')
+    );
+  });
+
+  /**
    * DELETE /api/v1/services/:id
    * Deletes a service by ID (Protected: Admin/Manager).
    */
@@ -110,3 +122,4 @@ class ServiceController {
 }
 
 export default new ServiceController();
+

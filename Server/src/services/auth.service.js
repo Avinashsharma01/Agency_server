@@ -193,12 +193,30 @@ class AuthService {
       meta.ip || ''
     );
 
-    await user.save({ validateBeforeSave: false });
+    try {
+      await user.save({ validateBeforeSave: false });
+    } catch (err) {
+      if (err.name === 'VersionError') {
+        logger.warn(`⚠️ VersionError during token refresh for ${user.email}, recovering atomically.`);
+        const latestUser = await userRepository.model.findById(user._id);
+        if (latestUser) {
+          latestUser.removeRefreshToken(oldRefreshToken);
+          latestUser.addRefreshToken(newRefreshToken, refreshExpiry, meta.userAgent || '', meta.ip || '');
+          await userRepository.model.updateOne(
+            { _id: user._id },
+            { refreshTokens: latestUser.refreshTokens }
+          );
+        }
+      } else {
+        throw err;
+      }
+    }
 
     logger.info(`Token refreshed for user: ${user.email}`);
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
+
 
   /**
    * Initiates the password reset flow.
