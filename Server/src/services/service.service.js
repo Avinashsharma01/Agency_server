@@ -1,8 +1,11 @@
 import serviceRepository from '../repositories/service.repository.js';
 import categoryRepository from '../repositories/category.repository.js';
 import ApiError from '../utils/ApiError.js';
-import { HTTP_STATUS } from '../constants/index.js';
+import { HTTP_STATUS, CLOUDINARY_FOLDERS } from '../constants/index.js';
+import { deleteFromCloudinary, uploadToCloudinary } from '../helpers/cloudinary.helper.js';
 import slugify from '../utils/slugify.js';
+import fs from 'fs/promises';
+import logger from '../utils/logger.js';
 
 /**
  * Service Business Logic Service.
@@ -184,6 +187,54 @@ class ServiceService {
   }
 
   /**
+   * Uploads or updates the service banner image.
+   *
+   * @param {string} serviceId - Service ObjectId
+   * @param {object} file - Multer file object
+   * @returns {Promise<object>} Updated service
+   */
+  async uploadFeaturedImage(serviceId, file) {
+    if (!file) {
+      throw ApiError.badRequest('Banner image file is required');
+    }
+
+    const service = await serviceRepository.findById(serviceId);
+    if (!service || service.isDeleted) {
+      throw ApiError.notFound('Service not found');
+    }
+
+    // Delete previous image if exists
+    if (service.featuredImage?.publicId) {
+      try {
+        await deleteFromCloudinary(service.featuredImage.publicId);
+      } catch (error) {
+        logger.warn(`Failed to delete old service image: ${error.message}`);
+      }
+    }
+
+    // Upload new image to Cloudinary
+    const result = await uploadToCloudinary(file.path, CLOUDINARY_FOLDERS.SERVICES, {
+      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    });
+
+    // Clean up local file
+    try {
+      await fs.unlink(file.path);
+    } catch (error) {
+      logger.warn(`Failed to delete temp file: ${file.path}`);
+    }
+
+    return serviceRepository.updateById(serviceId, {
+      featuredImage: {
+        publicId: result.publicId,
+        url: result.secureUrl,
+      },
+    }, {
+      populate: { path: 'category', select: 'name slug icon' },
+    });
+  }
+
+  /**
    * Soft deletes a Service.
    *
    * @param {string} serviceId - Service ObjectId
@@ -200,3 +251,4 @@ class ServiceService {
 }
 
 export default new ServiceService();
+

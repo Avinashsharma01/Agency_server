@@ -1,4 +1,4 @@
-# 🏢 Agency CMS — Backend API
+# 🏢 ParaSiteMedia — Backend API
 
 > **Production-ready RESTful API** for an Agency Management System.  
 > Built with Node.js, Express, MongoDB, JWT Authentication, Cloudinary, and Swagger.
@@ -934,7 +934,7 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_16_char_app_password
-SMTP_FROM_NAME=Agency CMS
+SMTP_FROM_NAME=ParaSiteMedia
 SMTP_FROM_EMAIL=noreply@youragency.com
 
 # Redis (optional — app works without it)

@@ -146,6 +146,8 @@ export const uploadWithFallback = async (filePath, options = {}) => {
       ...rest,
     });
 
+    logger.info(`☁️  Cloudinary upload successful: ${result.secure_url}`);
+
     return {
       publicId: result.public_id,
       url: result.secure_url,
@@ -158,6 +160,7 @@ export const uploadWithFallback = async (filePath, options = {}) => {
     };
   } catch (error) {
     logger.warn(`⚠️ Cloudinary upload error: ${error.message}. Falling back to local storage.`);
+    console.error('Cloudinary Error Details:', error);
 
     const basename = filename || path.basename(filePath);
     const host = `http://localhost:${config.app.port}`;
@@ -175,6 +178,7 @@ export const uploadWithFallback = async (filePath, options = {}) => {
     };
   }
 };
+
 
 /**
  * Deletes a resource from Cloudinary. If the publicId indicates a local file,

@@ -1,4 +1,4 @@
-# Agency CMS Backend — Full Audit Report
+# ParaSiteMedia Backend — Full Audit Report
 
 > **Audited**: `/home/avinash-sharma/Desktop/Agency/Server`
 > **Against**: [implementation_plan.md](file:///home/avinash-sharma/Desktop/Agency/docs/implementation_plan.md)

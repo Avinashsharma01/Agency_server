@@ -1,4 +1,4 @@
-# Agency CMS — Production-Ready Backend Implementation Plan
+# ParaSiteMedia — Production-Ready Backend Implementation Plan
 
 ## Overview
 

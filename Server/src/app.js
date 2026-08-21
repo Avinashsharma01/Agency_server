@@ -82,7 +82,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Agency CMS — API Documentation',
+    customSiteTitle: 'ParaSiteMedia — API Documentation',
     swaggerOptions: {
       persistAuthorization: true,
       docExpansion: 'none',

@@ -5,7 +5,7 @@ const settingSchema = new mongoose.Schema(
     siteName: {
       type: String,
       trim: true,
-      default: 'Agency CMS',
+      default: 'ParaSiteMedia',
     },
     siteTagline: {
       type: String,

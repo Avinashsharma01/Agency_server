@@ -40,7 +40,7 @@ const envSchema = z.object({
     .default('false'),
   SMTP_USER: z.string().min(1),
   SMTP_PASS: z.string().min(1),
-  SMTP_FROM_NAME: z.string().default('Agency CMS'),
+  SMTP_FROM_NAME: z.string().default('ParaSiteMedia'),
   SMTP_FROM_EMAIL: z.string().email(),
 
   // Redis (optional)

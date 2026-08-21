@@ -76,7 +76,7 @@ export const sendEmail = async ({ to, subject, text, html, template, replacement
 export const sendPasswordResetEmail = async (email, name, resetUrl) => {
   await sendEmail({
     to: email,
-    subject: 'Password Reset Request — Agency CMS',
+    subject: 'Password Reset Request — ParaSiteMedia',
     template: 'resetPassword',
     replacements: {
       name,
@@ -96,7 +96,7 @@ export const sendPasswordResetEmail = async (email, name, resetUrl) => {
 export const sendWelcomeEmail = async (email, name, loginUrl) => {
   await sendEmail({
     to: email,
-    subject: 'Welcome to Agency CMS',
+    subject: 'Welcome to ParaSiteMedia',
     template: 'welcomeEmail',
     replacements: {
       name,

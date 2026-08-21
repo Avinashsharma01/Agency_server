@@ -8,7 +8,7 @@ import config from './config/index.js';
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'Agency CMS — REST API',
+    title: 'ParaSiteMedia — REST API',
     version: '1.0.0',
     description:
       'Production-ready RESTful API for the Agency Management System. ' +
@@ -290,7 +290,7 @@ const swaggerDefinition = {
         type: 'object',
         properties: {
           _id: { type: 'string' },
-          siteName: { type: 'string', example: 'Agency CMS' },
+          siteName: { type: 'string', example: 'ParaSiteMedia' },
           siteTagline: { type: 'string' },
           siteLogo: {
             type: 'object',
